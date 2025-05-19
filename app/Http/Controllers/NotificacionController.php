@@ -38,7 +38,7 @@ class NotificacionController extends Controller
         $credentialsPath = storage_path('app/firebase/firebase_credentials.json');
         $credentials = json_decode(file_get_contents($credentialsPath), true);
 
-        echo $projectId;
+         die($projectId);
     
         $now = time();
         $tokenPayload = [
