@@ -39,8 +39,6 @@ class NotificacionController extends Controller
         $credentials = json_decode(file_get_contents($credentialsPath), true);
         $now = time();
 
-        die($projectId);
-
         $tokenPayload = [
             "iss" => $credentials['client_email'],
             "scope" => "https://www.googleapis.com/auth/firebase.messaging",
