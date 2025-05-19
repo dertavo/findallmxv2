@@ -84,7 +84,7 @@ class NotificacionController extends Controller
     public function notificar(Request $request)
 {
 
-    $token = 'e_BO0shsT6iAXrODpMThBC:APA91bE7B4dTQpeD-wlJuC2FCqKkRsZIg7zUl5rC7fGJeWrH3438pox_x6oGAn9cvIfG2MmccHKDvp7a2Ce0FNedSTIe-LR3Kv_JEyfAwsXNLFC_cYc_x_4';
+    $token = 'fFnefBUwRTmNR2KtmGhcNR:APA91bFlT8087WCglFSlnYADtSgvhmlim6Gb3KqCWlWLUoqXMyiHIdBQtHBLeGy_HD9aXTAHSAYIkDAlH5dQVvTqinqnK3CbrybGQdAMiN1LkaTB431PBVc';
     return $this->enviarNotificacionFCMV1($token, 'Hola desde Laravel', 'Esto es una notificación con API v1',11);
 }
 

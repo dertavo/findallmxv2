@@ -10,13 +10,13 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copiar el proyecto después de definir el WORKDIR
 COPY . .
 
-# Instalar dependencias (esto requiere que artisan ya esté copiado)
-RUN COMPOSER_ALLOW_SUPERUSER=1 composer install --no-interaction --prefer-dist --optimize-autoloader
+# Reinstala dependencias (Composer se ejecuta *dentro* del contenedor para evitar pérdida por volumen)
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-RUN php artisan storage:link
+# Laravel setup
+RUN php artisan storage:link || true
 RUN chown -R www-data:www-data storage bootstrap/cache
 RUN chmod -R 775 storage bootstrap/cache
 
