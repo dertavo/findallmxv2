@@ -34,7 +34,7 @@ class NotificacionController extends Controller
 
     function enviarNotificacionFCMV1($deviceToken, $titulo, $mensaje, $entity)
     {
-        $projectId = env('FIREBASE_PROJECT_ID');
+        $projectId = config('firebase.project_id');
         $credentialsPath = storage_path('app/firebase/firebase_credentials.json');
         $credentials = json_decode(file_get_contents($credentialsPath), true);
         $now = time();
