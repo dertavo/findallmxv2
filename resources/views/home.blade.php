@@ -59,13 +59,26 @@ Swal.fire({
   cancelButtonText: 'Cancelar'
 }).then((result) => {
   if (result.isConfirmed) {
-    // Si el usuario acepta, guardamos la información en localStorage
     localStorage.setItem('ubicacionAceptada', 'true');
-    // Aquí puedes agregar el código para pedir los permisos de ubicación al navegador
+    // Solicitar permisos de geolocalización al navegador
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log('Latitud:', position.coords.latitude);
+          console.log('Longitud:', position.coords.longitude);
+          // Aquí puedes usar la ubicación como desees
+        },
+        (error) => {
+          console.error('Error al obtener la ubicación:', error.message);
+          Swal.fire('Error', 'No pudimos obtener tu ubicación.', 'error');
+        }
+      );
+    } else {
+      Swal.fire('No compatible', 'Tu navegador no soporta geolocalización.', 'error');
+    }
   }
 });
 
-}
 
 
 getLocation();
