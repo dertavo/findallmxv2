@@ -187,7 +187,8 @@ async function drawData(){
    imgs.forEach(imagen => {
     imgsrc = imagen['archivo'];
     src = server_name+'/storage/entidades/'+imgsrc+'';
-    src = server_img + imgsrc;
+    //src = server_img + imgsrc;
+    
     id = "img"+imagen['id'];
     //console.log(src)
     imgdata = '<img id="'+id+'" onclick="toggleFullScreen('+id+')" src="'+src+'" class="img-thumbnail imagenesproducto">'  
