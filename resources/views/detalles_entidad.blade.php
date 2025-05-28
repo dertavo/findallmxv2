@@ -114,25 +114,43 @@ if(!no){
 })
 }
 
-var lat=0;
-var lng=0;
+var lat = 0;
+var lng = 0;
+
+// Llamar desde el inicio
 getLocation();
 
 function getLocation() {
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition);
-    
-  } else { 
-  alert("Geolocation is not supported by this browser.");
+    navigator.geolocation.getCurrentPosition(
+      showPosition,
+      handleLocationError // se ejecuta si falla
+    );
+  } else {
+    alert("Geolocalización no soportada por este navegador.");
+    setDefaultLocation();
   }
 }
 
 function showPosition(position) {
-  lat=position.coords.latitude;
-  lng=position.coords.longitude;
-  
-  drawData();
+  lat = position.coords.latitude;
+  lng = position.coords.longitude;
+
+  drawData(); // tu función para usar la ubicación
 }
+
+function handleLocationError(error) {
+  console.warn("No se pudo obtener la ubicación:", error.message);
+  setDefaultLocation();
+}
+
+function setDefaultLocation() {
+  // Ciudad de México como fallback
+  lat = 19.4326;
+  lng = -99.1332;
+  drawData(); // aún así mostrar contenido
+}
+
 
 async function drawData(){
 
