@@ -40,39 +40,39 @@ crossorigin=""></script>
 
 <script>
   // Verificamos si el usuario ya ha aceptado los permisos de ubicación
-  if (localStorage.getItem('ubicacionAceptada') !== 'true') {
-    // Creamos la alerta con SweetAlert2
-    Swal.fire({
-      title: 'Permisos de ubicación',
-      text: 'Para usar el sitio web de manera efectiva y eficiente, necesitamos que nos permitas acceder a tu ubicación.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Aceptar',
-      cancelButtonText: 'Cancelar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        localStorage.setItem('ubicacionAceptada', 'true');
-        // Solicitar permisos de geolocalización al navegador
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              console.log('Latitud:', position.coords.latitude);
-              console.log('Longitud:', position.coords.longitude);
-              // Aquí puedes usar la ubicación como desees
-            },
-            (error) => {
-              console.error('Error al obtener la ubicación:', error.message);
-              Swal.fire('Error', 'No pudimos obtener tu ubicación.', 'error');
-            }
-          );
-        } else {
-          Swal.fire('No compatible', 'Tu navegador no soporta geolocalización.', 'error');
-        }
-      }
-    });
-  }
+  // if (localStorage.getItem('ubicacionAceptada') !== 'true') {
+  //   // Creamos la alerta con SweetAlert2
+  //   Swal.fire({
+  //     title: 'Permisos de ubicación',
+  //     text: 'Para usar el sitio web de manera efectiva y eficiente, necesitamos que nos permitas acceder a tu ubicación.',
+  //     icon: 'warning',
+  //     showCancelButton: true,
+  //     confirmButtonColor: '#3085d6',
+  //     cancelButtonColor: '#d33',
+  //     confirmButtonText: 'Aceptar',
+  //     cancelButtonText: 'Cancelar'
+  //   }).then((result) => {
+  //     if (result.isConfirmed) {
+  //       localStorage.setItem('ubicacionAceptada', 'true');
+  //       // Solicitar permisos de geolocalización al navegador
+  //       if (navigator.geolocation) {
+  //         navigator.geolocation.getCurrentPosition(
+  //           (position) => {
+  //             console.log('Latitud:', position.coords.latitude);
+  //             console.log('Longitud:', position.coords.longitude);
+  //             // Aquí puedes usar la ubicación como desees
+  //           },
+  //           (error) => {
+  //             console.error('Error al obtener la ubicación:', error.message);
+  //             Swal.fire('Error', 'No pudimos obtener tu ubicación.', 'error');
+  //           }
+  //         );
+  //       } else {
+  //         Swal.fire('No compatible', 'Tu navegador no soporta geolocalización.', 'error');
+  //       }
+  //     }
+  //   });
+  // }
 
   getLocation();
 
