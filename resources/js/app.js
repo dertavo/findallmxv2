@@ -15,7 +15,7 @@ var app_port="";
 app_protocol  ="http://"
 app_port =""
 
-app_port = ":8000"
+//napp_port = ":8000"
 
 if(window.location.host == "localhost"){
     host = "/findall"

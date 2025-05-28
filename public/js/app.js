@@ -55197,7 +55197,9 @@ var app_protocol = "";
 var app_port = "";
 app_protocol = "http://";
 app_port = "";
-app_port = ":8000";
+
+//app_port = ":8000"
+
 if (window.location.host == "localhost") {
   host = "/findall";
   app_protocol = "http://";
