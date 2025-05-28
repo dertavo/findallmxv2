@@ -39,105 +39,57 @@ crossorigin=""></script>
 {{-- <script src="{{ asset('js/getToken.js') }}"></script> --}}
 
 <script>
-  // Verificamos si el usuario ya ha aceptado los permisos de ubicación
-  // if (localStorage.getItem('ubicacionAceptada') !== 'true') {
-  //   // Creamos la alerta con SweetAlert2
-  //   Swal.fire({
-  //     title: 'Permisos de ubicación',
-  //     text: 'Para usar el sitio web de manera efectiva y eficiente, necesitamos que nos permitas acceder a tu ubicación.',
-  //     icon: 'warning',
-  //     showCancelButton: true,
-  //     confirmButtonColor: '#3085d6',
-  //     cancelButtonColor: '#d33',
-  //     confirmButtonText: 'Aceptar',
-  //     cancelButtonText: 'Cancelar'
-  //   }).then((result) => {
-  //     if (result.isConfirmed) {
-  //       localStorage.setItem('ubicacionAceptada', 'true');
-  //       // Solicitar permisos de geolocalización al navegador
-  //       if (navigator.geolocation) {
-  //         navigator.geolocation.getCurrentPosition(
-  //           (position) => {
-  //             console.log('Latitud:', position.coords.latitude);
-  //             console.log('Longitud:', position.coords.longitude);
-  //             // Aquí puedes usar la ubicación como desees
-  //           },
-  //           (error) => {
-  //             console.error('Error al obtener la ubicación:', error.message);
-  //             Swal.fire('Error', 'No pudimos obtener tu ubicación.', 'error');
-  //           }
-  //         );
-  //       } else {
-  //         Swal.fire('No compatible', 'Tu navegador no soporta geolocalización.', 'error');
-  //       }
-  //     }
-  //   });
-  // }
+  const DEFAULT_LAT = 19.4326; // Ciudad de México
+  const DEFAULT_LNG = -99.1332;
 
-  getLocation();
-
-  var lat = 0;
-  var lng = 0;
+  var lat = DEFAULT_LAT;
+  var lng = DEFAULT_LNG;
   var map;
   var loadedMap = false;
   var u_lat, u_lng, popContent;
-  var server_name = window.location.origin; // Definir la base URL del servidor
+  var server_name = window.location.origin;
 
-  async function loadData(lat, lng) {
-    let ubicaciones = await getUbicaciones(lat, lng);
-    // console.log(ubicaciones);
-    ubicaciones.forEach(ubicacion => {
-      u_lat = ubicacion['latitud'];
-      u_lng = ubicacion['longitud'];
-      let nombre = ubicacion['nombre'];
-      let recompensa = ubicacion['recompensa'] == null ? "" : ubicacion['recompensa'];
-      let descripcion = ubicacion['descripcion'];
-      let publicPath = "";
-
-      if (window.location.host == "localhost") {
-        publicPath = "/public";
-      }
-
-      let url = server_name + publicPath + '/detalles_entidad/' + ubicacion['entidad_id'];
-      // console.log(url)
-
-      popContent = '<div style="max-width: 250px; white-space: normal">' +
-        '<h3>' + nombre + '</h3>' +
-        '<p style="word-wrap: break-word;">' + descripcion + '</p>' +
-        '<a href="' + url + '">Ver detalles</a>' +
-        '<p><b>$' + recompensa + '</b></p>' +
-        '</div>';
-
-      var distance = getDistance([lat, lng], [u_lat, u_lng]);
-      // console.log("DISTANCEEE:"+distance)
-      //if(distance <=1000){
-      drawMap();
-      loadedMap = true;
-      //}
-    });
-  }
-
-  async function getUbicaciones(lat, lng) {
-    let ruta = server_name + '/api/getUbicaciones/' + lat + '/' + lng;
-
-    const rawResponse = await fetch(ruta, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-    });
-
-    let response = await rawResponse.json();
-
-    return response;
-  }
-
-  function getLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(showPosition);
+  document.addEventListener("DOMContentLoaded", () => {
+    if (localStorage.getItem('ubicacionAceptada') !== 'true') {
+      Swal.fire({
+        title: 'Permisos de ubicación',
+        text: '¿Deseas permitir el acceso a tu ubicación?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          localStorage.setItem('ubicacionAceptada', 'true');
+          solicitarUbicacion();
+        } else {
+          // Usar ubicación por defecto si se niega
+          cargaMapa();
+        }
+      });
     } else {
-      alert("Geolocation is not supported by this browser.");
+      solicitarUbicacion();
+    }
+  });
+
+  function solicitarUbicacion() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          lat = position.coords.latitude;
+          lng = position.coords.longitude;
+          cargaMapa();
+        },
+        (error) => {
+          console.warn('No se pudo obtener la ubicación: ' + error.message);
+          cargaMapa(); // usar la ubicación por defecto
+        }
+      );
+    } else {
+      console.warn("El navegador no soporta geolocalización.");
+      cargaMapa(); // usar la ubicación por defecto
     }
   }
 
@@ -146,7 +98,7 @@ crossorigin=""></script>
 
     map = L.map('map').setView([lat, lng], 16);
     L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + token, {
-      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+      attribution: 'Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
       maxZoom: 18,
       id: 'mapbox/streets-v11',
       tileSize: 512,
@@ -157,35 +109,43 @@ crossorigin=""></script>
     loadData(lat, lng);
   }
 
-  function showPosition(position) {
-    lat = position.coords.latitude;
-    lng = position.coords.longitude;
+  async function loadData(lat, lng) {
+    let ubicaciones = await getUbicaciones(lat, lng);
+    ubicaciones.forEach(ubicacion => {
+      u_lat = ubicacion['latitud'];
+      u_lng = ubicacion['longitud'];
+      let nombre = ubicacion['nombre'];
+      let recompensa = ubicacion['recompensa'] || "";
+      let descripcion = ubicacion['descripcion'];
+      let publicPath = (window.location.host == "localhost") ? "/public" : "";
+      let url = server_name + publicPath + '/detalles_entidad/' + ubicacion['entidad_id'];
 
-    cargaMapa();
+      popContent = `<div style="max-width: 250px; white-space: normal">
+        <h3>${nombre}</h3>
+        <p style="word-wrap: break-word;">${descripcion}</p>
+        <a href="${url}">Ver detalles</a>
+        <p><b>$${recompensa}</b></p>
+      </div>`;
+
+      drawMap();
+    });
   }
 
-  function getDistance(origin, destination) {
-    // return distance in meters
-    var lon1 = toRadian(origin[1]),
-      lat1 = toRadian(origin[0]),
-      lon2 = toRadian(destination[1]),
-      lat2 = toRadian(destination[0]);
-
-    var deltaLat = lat2 - lat1;
-    var deltaLon = lon2 - lon1;
-
-    var a = Math.pow(Math.sin(deltaLat / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(deltaLon / 2), 2);
-    var c = 2 * Math.asin(Math.sqrt(a));
-    var EARTH_RADIUS = 6371;
-    return c * EARTH_RADIUS * 1000;
-  }
-
-  function toRadian(degree) {
-    return degree * Math.PI / 180;
+  async function getUbicaciones(lat, lng) {
+    let ruta = server_name + '/api/getUbicaciones/' + lat + '/' + lng;
+    const rawResponse = await fetch(ruta, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+    });
+    return await rawResponse.json();
   }
 
   function drawMap() {
-    var marker = L.marker([u_lat, u_lng]).bindPopup(popContent).addTo(map);
+    L.marker([u_lat, u_lng]).bindPopup(popContent).addTo(map);
   }
 </script>
+
 @endsection
