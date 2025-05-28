@@ -170,7 +170,7 @@ async function drawData(){
   card_text=document.getElementById('card_text');
 
   email = user['email']
-  url_user = server_name + '/public/contact-profile/'+ user['id']
+  url_user = server_name + '/contact-profile/'+ user['id']
 
   reco = info['recompensa'] == null ? "" : info['recompensa']
   
