@@ -186,7 +186,7 @@ async function drawData(){
 
    imgs.forEach(imagen => {
     imgsrc = imagen['archivo'];
-    src = server_name+'/public/storage/entidades/'+imgsrc+'';
+    src = server_name+'/storage/entidades/'+imgsrc+'';
     src = server_img + imgsrc;
     id = "img"+imagen['id'];
     //console.log(src)
