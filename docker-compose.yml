@@ -13,9 +13,10 @@ services:
     environment:
       - DB_HOST=db
       - DB_PORT=3306
-      - DB_DATABASE=laravel
-      - DB_USERNAME=root
-      - DB_PASSWORD=root
+      - DB_DATABASE=findallmx
+      - DB_USERNAME=dertavo
+      - DB_PASSWORD=T8k?zP1q
+
     depends_on:
       - db
 
@@ -26,8 +27,8 @@ services:
     environment:
       MYSQL_DATABASE: laravel
       MYSQL_ROOT_PASSWORD: root
-    ports:
-      - "3306:3306"
+    #ports:
+    #  - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
 
