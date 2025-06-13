@@ -1,0 +1,9 @@
+node_modules
+vendor
+storage/*.log
+.env
+.git
+.gitignore
+.idea
+*.zip
+*.tar
