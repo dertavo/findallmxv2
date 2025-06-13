@@ -374,6 +374,25 @@ class EntidadController extends Controller
     }
     }
 
+    public function deleteUpdateImage($entidad){
+
+        $links = ImagenesEntidad::where('entidad_id',$entidad)
+          ->where('type','post')
+          ->get();
+
+       
+        foreach ($links as $key => $link) {
+            $file = 'entidades/' . $link->archivo;
+                if (Storage::disk('public')->exists($file)) {
+                    Storage::disk('public')->delete($file);
+                }
+        }
+          ImagenesEntidad::where('entidad_id',$entidad)
+          ->where('type','post')
+          ->delete();
+
+    }
+
     public function editarEntidadMovil(Request $request, $id){
       
         $f = $request->locations;   
@@ -385,7 +404,6 @@ class EntidadController extends Controller
             'nombre'=>'required|max:100',
             'descripcion'=>'required|max:200',
             'fecha_extravio'=>'required',
-            //'imagenes'=>'required',
         ]);
         if($files != null){
             $validator = Validator::make($request->all(), [
@@ -453,9 +471,32 @@ class EntidadController extends Controller
               
                 //actualiza la entidad en las imagenes para relacionarlas.
 
-                //$this->registro_img($request,$id_entidad);
+                $imagenes = $request->input('files');
+                $nombresArchivos = [];
                 if($limit_upimg==false){
-                   // $this->ex($files,$id_entidad);
+
+                    $this->deleteUpdateImage($id_entidad);
+                    foreach ($imagenes as $imagenData) {
+                        $imagenBase64 = $imagenData['imagenBase64'];
+                        $tipoImagen = $imagenData['type'];
+        
+                        $imagenDecodificada = base64_decode($imagenBase64);
+        
+                        if ($imagenDecodificada === false) {
+                            return response()->json([
+                                'error' => 'Error al decodificar una imagen Base64',
+                                'code' => 400,
+                            ], 400);
+                        }
+        
+                        $nombreArchivo = Str::random(40) . '.' . explode('/', $tipoImagen)[1];
+                        Storage::disk('public')->put('entidades/' . $nombreArchivo, $imagenDecodificada);
+                        $nombresArchivos[] = $nombreArchivo;
+
+                        //Save on the bd
+
+                        $data_id =  ImagenesEntidad::create(["entidad_id"=>$id_entidad,"archivo"=>$nombreArchivo,"type"=>"post"]);
+                    }
                 }
                  
                 //check number of points selected.
@@ -660,11 +701,6 @@ class EntidadController extends Controller
 
     public function registro_movil(Request $request){
 
-        
-        $f = $request->locations;   
-
-        $response = array('response' => '', 'success'=>false);
-        $files = $request->file('files');
 
 
             $validator = Validator::make($request->all(), [
@@ -688,6 +724,13 @@ class EntidadController extends Controller
                 ]
                 );
               }
+
+                     
+        $f = $request->locations;   
+
+        $response = array('response' => '', 'success'=>false);
+        $imagenes = $request->input('files');
+ 
          
             if(sizeof($f)>4){
                 return response()->json([
@@ -697,9 +740,15 @@ class EntidadController extends Controller
                 ]
                 );
             }
+            if(count($imagenes)>4){
+                return response()->json([
+                    "response"=>'La cantidad de imagenes no debe ser mayor a 4 imagenes.',
+                    "f"=>sizeof($f),
+                    "code"=>404,
+                ]
+                );
+            }
            
-        
-
     
         DB::beginTransaction();
         try{
@@ -737,8 +786,6 @@ class EntidadController extends Controller
 
                
 
-               
-                $imagenes = $request->input('files');
                 $nombresArchivos = [];
 
                 if($limit_upimg==false){

@@ -93,6 +93,10 @@ Route::get('/findedAPI/{user}', [PruebasEntidadController::class, 'findedAPI'])
 ->name('finded');
 
 
+// Route::get('deleteUpdateImage/{entidad}', [EntidadController::class,'deleteUpdateImage'])
+// //->middleware('auth:sanctum')
+// ->name('deleteUpdateImage');
+
 
 Route::post('deleteEntidad/{user}', [EntidadController::class,'deleteEntidad'])
 ->middleware('auth:sanctum')
